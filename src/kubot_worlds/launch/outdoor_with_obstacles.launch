@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+    <include file="$(find kubot_worlds)/launch/start.launch">
+        <arg name="world" value="$(find kubot_worlds)/worlds/outdoor_with_obstacles.world"/> 
+    </include>
+</launch>
