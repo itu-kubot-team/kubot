@@ -3,15 +3,18 @@
 <launch>
     
     <!-- Start Gazebo with wg world running in (max) realtime -->
+    <!-- Use our custom world -->
     <include file="$(find kubot_worlds)/launch/outdoor_with_obstacles.launch"/>
+    <!--<include file="$(find hector_gazebo_worlds)/launch/willow_garage.launch"/>-->
     
     <!-- Spawn simulated quadrotor uav -->
     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
         <!-- Initial coordinates of robot -->
         <arg name="x" value="0.0"/>
         <arg name="y" value="0.0"/>
-        <arg name="z" value="0.0"/>
-        <arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_hokuyo_utm30lx.gazebo.xacro"/> 
+        <!--<arg name="model" value="$(find hector_quadrotor_description)/urdf/quadrotor_hokuyo_utm30lx.gazebo.xacro"/>-->
+        <!-- We'd like to use both hukuyo laser scanner and kinect sensor-->
+        <arg name="model" value="$(find kubot_launch)/urdf/quadrotor_with_kinect_with_hokuyo_utm30lx.gazebo.xacro"/>
     </include>
     
     <!-- Start SLAM system -->
@@ -25,6 +28,7 @@
     </include>
     
     <!-- Start rviz visualization with preset config -->
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find kubot_launch)/rviz_cfg/kubot_outdoor.rviz"/>
+    <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find kubot_launch)/rviz_cfg/kubot_outdoor.rviz"/>-->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find kubot_launch)/rviz_cfg/kubot_indoor.rviz"/>
     
 </launch>
