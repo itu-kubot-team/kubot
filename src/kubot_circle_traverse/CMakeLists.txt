@@ -187,6 +187,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-#add_executable(kubot_circle_traverse src/kubot_circle_traverse_publisher.cpp)
-#target_link_libraries(kubot_circle_traverse ${catkin_LIBRARIES})
-#add_dependencies(kubot_circle_traverse kubot_circle_traverse_publisher_cpp)
+add_executable(kubot_circle_traverse src/kubot_circle_traverse_publisher.cpp)
+target_link_libraries(kubot_circle_traverse ${catkin_LIBRARIES})
+add_dependencies(kubot_circle_traverse kubot_circle_traverse_publisher_cpp)
