@@ -25,14 +25,15 @@ float dir_y;
 float goal_x = 0;
 float goal_y = 0;
 ros::Publisher marker_publisher, motor_command_publisher;
-ros::Subscriber map_subscriber, laser_subscriber;
+ros::Subscriber map_subscriber, waypoint_subscriber;
 tf::StampedTransform robot_pose;
 geometry_msgs::Twist motor_command;
 visualization_msgs::MarkerArray marker_array;
 tf::TransformListener* tListener;
-laser_geometry::LaserProjection projector;
 visualization_msgs::Marker current_marker;
 sensor_msgs::PointCloud cloud;
+
+bool isGoalSet = false;
 
 float* potential_field_goal(float x, float y){
     float _dir_x = goal_x - x;
@@ -119,8 +120,8 @@ visualization_msgs::Marker arrow_marker_at(float x, float y) {
     marker.scale.z = 0;
     
     marker.color.r = 0.0;
-    marker.color.g = 1.0;
-    marker.color.b = 0.5;
+    marker.color.g = 0.5;
+    marker.color.b = 1.0;
     marker.color.a = 1.0;
     
     marker.id = marker_counter++;
@@ -239,14 +240,13 @@ counter++;
     ROS_INFO("end\n\n\n\n\n\n");
 }
 
-void scanCallback (const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-    if(!tListener->waitForTransform(msg->header.frame_id, "/base_link",
-        msg->header.stamp + ros::Duration().fromSec(msg->ranges.size()*msg->time_increment), ros::Duration(1.0))){
-     return;
-    }
-    projector.transformLaserScanToPointCloud("base_link",*msg, cloud, *tListener);
+void waypoint_callback(const geometry_msgs::PointStamped::ConstPtr& waypoint_in){
+    goal_x = waypoint_in->point.x;
+    goal_y = waypoint_in->point.y;
+    isGoalSet = true;
+    std::cout << "Goal: " << goal_x << "  " << goal_y << std::endl;
 }
+
 
 int main(int argc, char **argv) {
     std::cout << "Evet .. Hello, world!" << std::endl;
@@ -283,27 +283,30 @@ int main(int argc, char **argv) {
     motor_command.angular.z = 0.0;
     motor_command_publisher.publish(motor_command);
     
-    laser_subscriber = n.subscribe("/scan", 1, scanCallback);
     map_subscriber = n.subscribe("/map", 1 , map_callback);
+    waypoint_subscriber = n.subscribe("/waypoint", 1000, waypoint_callback);
     ros::Duration time_between_ros_wakeups(0.01);
     
-    std::cout << "Enter goal (x,y) :";
-    std::cin >> goal_x >> goal_y;
+    //std::cout << "Enter goal (x,y) :";
+    //std::cin >> goal_x >> goal_y;
     
-    //ros::Duration(0.5).sleep();
+    ros::Duration(0.5).sleep();
     
     
     while(ros::ok())
     {
         try{
-            //listener.waitForTransform("/world","/base_link", ros::Time(0), ros::Duration(10.0));
+            listener.waitForTransform("/world","/base_link", ros::Time(0), ros::Duration(10.0));
             listener.lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
         }
-        catch (tf::TransformException ex){
+        catch (std::exception ex){
             ROS_ERROR("%s",ex.what());
             ros::Duration(1.0).sleep();
         }
         ros::spinOnce();
+        
+        if(isGoalSet == false)
+            continue;
         
         geometry_msgs::Point tail = current_marker.points[0];
         geometry_msgs::Point head = current_marker.points[1];
@@ -353,16 +356,13 @@ int main(int argc, char **argv) {
         else {
             //motor_command.linear.x = 0.2 * (head.x - tail.x);
             //motor_command.linear.y = 0.2 * (head.y - tail.y);
-            motor_command.linear.x = 0.2 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2));
+            motor_command.linear.x = 0.40 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2));
             motor_command.linear.y = 0.0;
             motor_command.linear.z = 0.0;
             
-            if(fabs(motor_command.linear.x) < 0.01)
-                motor_command.linear.x *= 2;
-            
-            if(fabs(motor_command.linear.y) < 0.01)
-                motor_command.linear.y *= 2;
-            
+            if(fabs(motor_command.linear.x) < 0.1)
+                motor_command.linear.x = 0.1;
+                        
             motor_command.angular.x = 0;
             motor_command.angular.y = 0;
             motor_command.angular.z = 0.0;
@@ -374,4 +374,3 @@ int main(int argc, char **argv) {
     }
     return 0;
 }
-
