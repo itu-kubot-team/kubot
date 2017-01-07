@@ -1167,7 +1167,7 @@
         <collision name='collision'>
           <geometry>
             <sphere>
-              <radius>0.5</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -1184,7 +1184,7 @@
         <visual name='visual'>
           <geometry>
             <sphere>
-              <radius>0.5</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <material>
@@ -1221,7 +1221,7 @@
         <collision name='collision'>
           <geometry>
             <sphere>
-              <radius>0.5</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -1238,7 +1238,7 @@
         <visual name='visual'>
           <geometry>
             <sphere>
-              <radius>0.6</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <material>
@@ -1275,7 +1275,7 @@
         <collision name='collision'>
           <geometry>
             <sphere>
-              <radius>0.5</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -1292,7 +1292,7 @@
         <visual name='visual'>
           <geometry>
             <sphere>
-              <radius>0.3</radius>
+              <radius>0.7</radius>
             </sphere>
           </geometry>
           <material>

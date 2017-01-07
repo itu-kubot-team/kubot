@@ -15,8 +15,8 @@
 #include <cmath>
 
 #define PI 3.14159265
-#define MIN_ROTATION_SPEED 0.1
-#define MAX_ROTATION_SPEED 0.3
+#define MIN_ROTATION_SPEED 0.2
+#define MAX_ROTATION_SPEED 0.4
 #define MAX_ANGLE_DIFF  180
 
 float marker_counter = 0;
@@ -25,13 +25,14 @@ float dir_y;
 float goal_x = 0;
 float goal_y = 0;
 ros::Publisher marker_publisher, motor_command_publisher;
-ros::Subscriber map_subscriber, waypoint_subscriber;
+ros::Subscriber map_subscriber, waypoint_subscriber, laserscan_subscriber;
 tf::StampedTransform robot_pose;
 geometry_msgs::Twist motor_command;
 visualization_msgs::MarkerArray marker_array;
 tf::TransformListener* tListener;
 visualization_msgs::Marker current_marker;
 sensor_msgs::PointCloud cloud;
+sensor_msgs::LaserScan laser_msg;
 
 bool isGoalSet = false;
 
@@ -61,10 +62,11 @@ float* potential_field_obst(float x,float y, nav_msgs::OccupancyGrid grid){
             float obst_x = originx + X*grid.info.resolution;
             float obst_y = originy + Y*grid.info.resolution;
             float occupancy = grid.data[Y*grid.info.width + X]/100;
+       
             if (occupancy<0) 
                 occupancy=1.0;
             
-            if(occupancy > 0.99){
+            if(occupancy > 0.95){
                 float dist = sqrt(pow(obst_x - x,2) + pow(obst_y - y, 2));
                 if(dist < min_dist){
                     min_dist = dist;
@@ -84,8 +86,8 @@ float* potential_field_obst(float x,float y, nav_msgs::OccupancyGrid grid){
         _dir_y = (y-min_y) / pow(min_dist,4);
     }
     
-    pf_obst[0] = _dir_x * 1.3;
-    pf_obst[1] = _dir_y * 1.4;
+    pf_obst[0] = _dir_x * 1;
+    pf_obst[1] = _dir_y * 1;
     return pf_obst;
 }
 
@@ -148,7 +150,7 @@ float normalize_angle(float angle_in_degree){
 }
 
 
-void setGoalMarker(){
+void setGoalMarker(){    
     visualization_msgs::Marker goal_marker;
     goal_marker.header.frame_id = "/world";
     goal_marker.action = visualization_msgs::Marker::ADD;
@@ -157,7 +159,7 @@ void setGoalMarker(){
     goal_marker.pose.position.x = goal_x;
     goal_marker.pose.position.y = goal_y;
     goal_marker.pose.position.z = robot_pose.getOrigin().z();
-    
+    goal_marker.lifetime = ros::Duration(180.0);
     goal_marker.scale.x = 0.1;
     goal_marker.scale.y = 0.1;
     goal_marker.scale.z = 0.1;
@@ -247,6 +249,14 @@ void waypoint_callback(const geometry_msgs::PointStamped::ConstPtr& waypoint_in)
     std::cout << "Goal: " << goal_x << "  " << goal_y << std::endl;
 }
 
+void laserscan_callback(const sensor_msgs::LaserScan::ConstPtr& msg){
+    laser_msg = *msg;
+    
+    //std::cout << "Range size: " << laser_msg.ranges.size() << std::endl;
+    //std::cout << "Leftmost range: " << laser_msg.ranges[laser_msg.ranges.size()-45*4] << std::endl;
+    //std::cout << "Middle range: " << laser_msg.ranges[laser_msg.ranges.size() / 2] << std::endl;
+    //std::cout << "Rightmost range: " << laser_msg.ranges[45*4] << std::endl;
+}
 
 int main(int argc, char **argv) {
     std::cout << "Evet .. Hello, world!" << std::endl;
@@ -269,7 +279,7 @@ int main(int argc, char **argv) {
     motor_command_publisher.publish(motor_command);
     
     tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
-    while(fabs(robot_pose.getOrigin().z() - 1) > 0.05){
+    while(fabs(robot_pose.getOrigin().z() - 0.5) > 0.02){
         tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
         std::cout << "height: " << robot_pose.getOrigin().z() << std::endl;
     }
@@ -285,6 +295,7 @@ int main(int argc, char **argv) {
     
     map_subscriber = n.subscribe("/map", 1 , map_callback);
     waypoint_subscriber = n.subscribe("/waypoint", 1000, waypoint_callback);
+    laserscan_subscriber = n.subscribe("/scan", 1000, laserscan_callback);
     ros::Duration time_between_ros_wakeups(0.01);
     
     //std::cout << "Enter goal (x,y) :";
@@ -343,7 +354,7 @@ int main(int argc, char **argv) {
             motor_command.angular.z = angular_z;
             motor_command_publisher.publish(motor_command);
             
-            std::cout << "\nPUBLISHED!!! angular.z: " << motor_command.angular.z << "\n\n" << std::endl;
+            //std::cout << "\nPUBLISHED!!! angular.z: " << motor_command.angular.z << "\n\n" << std::endl;
             
             ros::Duration(0.1).sleep();
             listener.lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
@@ -360,9 +371,18 @@ int main(int argc, char **argv) {
             motor_command.linear.y = 0.0;
             motor_command.linear.z = 0.0;
             
+            if(laser_msg.ranges[laser_msg.ranges.size() / 2] < 1 || (laser_msg.ranges[45*4] < 0.5) || (laser_msg.ranges[laser_msg.ranges.size()-45*4] < 0.5))
+                motor_command.linear.x = 0.1;
+            
+            else if(laser_msg.ranges[laser_msg.ranges.size() / 2] > 10 && (laser_msg.ranges[laser_msg.ranges.size()-1] > 7.5) && (laser_msg.ranges[0] > 7.5))
+                motor_command.linear.x *= 0.5 * laser_msg.ranges[laser_msg.ranges.size() / 2];
+            
             if(fabs(motor_command.linear.x) < 0.1)
                 motor_command.linear.x = 0.1;
-                        
+            
+            if(fabs(motor_command.linear.x) > 0.6)
+                motor_command.linear.x = 0.6;
+
             motor_command.angular.x = 0;
             motor_command.angular.y = 0;
             motor_command.angular.z = 0.0;
