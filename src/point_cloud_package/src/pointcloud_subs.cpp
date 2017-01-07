@@ -25,6 +25,7 @@ using std::cout;
 using std::endl;
 
 std_msgs::String str;
+ros::Publisher pub;
 
 void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
 {
@@ -56,10 +57,11 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
       str.data = "found red";
       }
     }
-    else{
-      str.data = "nothing"; 
-    }
  
+    std_msgs::String nstr;
+    nstr.data = str.data;
+    pub.publish(nstr);
+	
 }
 
 void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
@@ -116,11 +118,9 @@ int main(int argc, char **argv) {
   //sub2 = nh2.subscribe<sensor_msgs::PointCloud2>("/camera/depth/points", 1, callback2);
   
   ros::init(argc, argv, "publish");
-  ros::Publisher pub;
   pub = nh.advertise<std_msgs::String>("detectionresult", 1000);
   
   
-  pub.publish(str);
   ros::Rate spin_rate(1);
   while(ros::ok())
     ros::spin();
