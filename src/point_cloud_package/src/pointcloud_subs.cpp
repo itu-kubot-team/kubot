@@ -70,7 +70,7 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
   pcl_conversions::toPCL(*cloud,pcl_pc2); 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud); 
- 
+/*
    pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
    pcl::SACSegmentation<pcl::PointXYZRGB> segmentation;
    segmentation.setInputCloud(temp_cloud);
@@ -79,15 +79,38 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
    segmentation.setDistanceThreshold(1000); 
    segmentation.setOptimizeCoefficients(true);
   // segmentation.setRadiusLimits(0.1, 1);
-   segmentation.setMaxIterations(10000);
-   
+   segmentation.setMaxIterations(100);
+ */
+
+      pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+      pcl::SACSegmentation<pcl::PointXYZRGB> segmentation; 
+      segmentation.setOptimizeCoefficients(true); 
+      segmentation.setModelType(pcl::SACMODEL_PLANE); 
+      segmentation.setMethodType(pcl::SAC_RANSAC); 
+      segmentation.setDistanceThreshold(0.01);
+      segmentation.setMaxIterations(200); 
+      segmentation.setInputCloud(temp_cloud);
+      segmentation.setEpsAngle (0.1);
+
    pcl::PointIndices inlierIndices;
    segmentation.segment(inlierIndices, *coefficients);
    
+    
+    
    if (inlierIndices.indices.size() != 0)    
    {
-    ROS_INFO("RANSAC found shape with [%d] points", (int)inlierIndices.indices.size());
-    cout << "CYLINDER!" << endl;
+    int size = (int)inlierIndices.indices.size();
+    ROS_INFO("RANSAC found shape with [%d] points", size);
+    float y1 = temp_cloud->points[inlierIndices.indices[0]].y;
+    float y2 =temp_cloud->points[inlierIndices.indices[size/2]].y;
+    cout << temp_cloud->points[inlierIndices.indices[0]].x << "  " << y1 << "  " << temp_cloud->points[inlierIndices.indices[0]].z << endl;
+    cout << temp_cloud->points[inlierIndices.indices[size/2]].x << "  " << y2 << "  " << temp_cloud->points[inlierIndices.indices[size/2]].z << endl;
+    
+    if(fabs(y2- y1) < 0.1)
+    {cout << "CUBE!" << endl;}
+    else
+    {cout << "WALL!" << endl;}
+    
     /*for (int c=0; c<coefficients->values.size(); ++c)
         ROS_INFO("Coeff %d = [%f]", (int)c+1, (float)coefficients->values[c]);
     */
