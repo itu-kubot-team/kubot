@@ -26,6 +26,21 @@ using std::endl;
 
 std_msgs::String str;
 ros::Publisher pub;
+int found;
+
+void callback0(const sensor_msgs::PointCloud2ConstPtr& cloud)
+{
+  callback(cloud);
+  if(found == 0)
+  {callback2(cloud);}
+  
+   
+   std_msgs::String nstr;
+   nstr.data = str.data;
+   pub.publish(nstr);
+	
+  
+}
 
 void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
 {
@@ -42,7 +57,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
    segmentation.setDistanceThreshold(1000); 
    segmentation.setOptimizeCoefficients(true);
    segmentation.setRadiusLimits(0.1, 1);
-   segmentation.setMaxIterations(10000);
+   segmentation.setMaxIterations(1000);
    
    pcl::PointIndices inlierIndices;
    segmentation.segment(inlierIndices, *coefficients);
@@ -55,6 +70,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
     if((int)temp_cloud->points[inlierIndices.indices[0]].r>(int)temp_cloud->points[inlierIndices.indices[0]].g && (int)temp_cloud->points[inlierIndices.indices[0]].r>(int)temp_cloud->points[inlierIndices.indices[0]].g){
       cout << "RED SPHERE!" << endl;
       str.data = "found red";
+      found = 1;
       }
     }
  
@@ -102,12 +118,24 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
     int size = (int)inlierIndices.indices.size();
     ROS_INFO("RANSAC found shape with [%d] points", size);
     float y1 = temp_cloud->points[inlierIndices.indices[0]].y;
+    float z1 = temp_cloud->points[inlierIndices.indices[0]].z;
     float y2 =temp_cloud->points[inlierIndices.indices[size/2]].y;
+    float z2 =temp_cloud->points[inlierIndices.indices[size/2]].z;
+    
+    
+    float transformedy1 = y1*cos(-1)-z1*sin(-1);
+    float transformedy2 = y2*cos(-1)-z2*sin(-1);
+    
     cout << temp_cloud->points[inlierIndices.indices[0]].x << "  " << y1 << "  " << temp_cloud->points[inlierIndices.indices[0]].z << endl;
     cout << temp_cloud->points[inlierIndices.indices[size/2]].x << "  " << y2 << "  " << temp_cloud->points[inlierIndices.indices[size/2]].z << endl;
     
-    if(fabs(y2- y1) < 0.1)
-    {cout << "CUBE!" << endl;}
+    cout << transformedy1 << endl;
+    cout << transformedy2 << endl;
+    
+    if(fabs(transformedy2- transformedy1) < 0.1)
+    {cout << "CUBE!" << endl;
+     str.data = "found cube";
+    }
     else
     {cout << "WALL!" << endl;}
     
@@ -122,7 +150,8 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
 	}
     }
     if (color_count*100/inlierIndices.indices.size()> 50){
-      cout << "BLUE CYLINDER!"<<endl;
+      cout << "BLUE CUBE!"<<endl;
+      str.data = "found blue";
     }
    }
 }
@@ -133,11 +162,11 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh("/");
   ros::Subscriber sub;  
   str.data = "nothing";
-
+  found = 0;
  
   //ros::NodeHandle nh2("/");
   //ros::Subscriber sub2;  
-  sub =nh.subscribe<sensor_msgs::PointCloud2>("/camera/depth/points", 1, callback);
+  sub =nh.subscribe<sensor_msgs::PointCloud2>("/camera/depth/points", 1, callback0);
   //sub2 = nh2.subscribe<sensor_msgs::PointCloud2>("/camera/depth/points", 1, callback2);
   
   ros::init(argc, argv, "publish");
