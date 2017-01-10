@@ -14,7 +14,7 @@
 
 #define CIRCLE_CENTER_X  0.0            // meters
 #define CIRCLE_CENTER_Y  0.0            // meters
-#define CIRCLE_RADIUS  15.0             // meters
+#define CIRCLE_RADIUS  8.0            // meters
 #define CIRCLE_SLICE_WIDTH 1.0          // meters
 #define PROXIMITY_THERESHOLD 0.5        // meters
 #define ROS_RATE 10
