@@ -2,8 +2,8 @@
 
 <robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
    
-    <xacro:property name="M_PI" value="3.1415926535897931" />
-    
+    <xacro:property name="M_PI" value="3.1415926535897931" />   <!-- 90 degree -->
+    <xacro:property name="M_PI/4" value="0.78539816339" />      <!-- 45 degree -->
     <!-- Included URDF Files -->
     <xacro:include filename="$(find hector_quadrotor_description)/urdf/quadrotor_base.urdf.xacro" />
     
@@ -16,10 +16,10 @@
       <origin xyz="0.0 0.0 -0.097" rpy="${M_PI} 0 0"/>
     </xacro:hokuyo_utm30lx>
     
-        <!-- Kinect -->
+    <!-- Kinect -->
     <xacro:include filename="$(find hector_sensors_description)/urdf/kinect_camera.urdf.xacro" />
     <xacro:kinect_camera name="camera" parent="base_link">
-      <origin xyz="0.0 0.0 -0.15" rpy="0 1 1"/>
+      <origin xyz="0.1 0.0 -0.05" rpy="0 1 0"/>
     </xacro:kinect_camera>
     
 </robot>
