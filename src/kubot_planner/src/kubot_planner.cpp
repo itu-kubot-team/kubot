@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
     
     motor_command.linear.x = 0.0;
     motor_command.linear.y = 0.0;
-    motor_command.linear.z = 0.2;
+    motor_command.linear.z = 0.3;
     
     motor_command.angular.x = 0.0;
     motor_command.angular.y = 0.0;
@@ -294,7 +294,7 @@ int main(int argc, char **argv) {
     motor_command_publisher.publish(motor_command);
     
     tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
-    while(fabs(robot_pose.getOrigin().z() - 1.0) > 0.02){
+    while(fabs(robot_pose.getOrigin().z() - 1.5) > 0.01){
         tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
         std::cout << "height: " << robot_pose.getOrigin().z() << std::endl;
     }
@@ -381,7 +381,7 @@ int main(int argc, char **argv) {
         else {
             //motor_command.linear.x = 0.2 * (head.x - tail.x);
             //motor_command.linear.y = 0.2 * (head.y - tail.y);
-            motor_command.linear.x = 0.40 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2));
+            motor_command.linear.x = 0.30 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2));
             motor_command.linear.y = 0.0;
             motor_command.linear.z = 0.0;
             

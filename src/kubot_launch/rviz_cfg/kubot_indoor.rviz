@@ -167,7 +167,7 @@ Visualization Manager:
       Buffer Length: 1
       Class: rviz/Path
       Color: 170; 0; 0
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.3
       Head Length: 0.2
       Length: 0.3
@@ -184,7 +184,7 @@ Visualization Manager:
       Shaft Length: 0.1
       Topic: /trajectory
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /marker_vis
@@ -235,7 +235,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.60299
+      Distance: 8.5678
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
