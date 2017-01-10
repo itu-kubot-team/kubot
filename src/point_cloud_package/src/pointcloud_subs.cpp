@@ -57,7 +57,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
    segmentation.setDistanceThreshold(1000); 
    segmentation.setOptimizeCoefficients(true);
    segmentation.setRadiusLimits(0.1, 1);
-   segmentation.setMaxIterations(10000);
+   segmentation.setMaxIterations(1000);
    
    pcl::PointIndices inlierIndices;
    segmentation.segment(inlierIndices, *coefficients);
