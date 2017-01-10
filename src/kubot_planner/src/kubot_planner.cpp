@@ -158,7 +158,6 @@ void setGoalMarker(){
     goal_marker.pose.position.x = goal_x;
     goal_marker.pose.position.y = goal_y;
     goal_marker.pose.position.z = robot_pose.getOrigin().z();
-    goal_marker.lifetime = ros::Duration(120.0);
     goal_marker.scale.x = 0.1;
     goal_marker.scale.y = 0.1;
     goal_marker.scale.z = 0.1;
@@ -170,7 +169,6 @@ void setGoalMarker(){
 }
 
 void map_callback(nav_msgs::OccupancyGrid grid){
-    ROS_INFO("\n\n\n\n\n\nstart");
     tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
     std::cout << "Robot: x: " << robot_pose.getOrigin().x() << " y: " << robot_pose.getOrigin().x() << std::endl;
     std::cout << "Goal: x: " << goal_x << " y: " << goal_y << std::endl;
@@ -195,9 +193,17 @@ void laserscan_callback(const sensor_msgs::LaserScan::ConstPtr& msg){
 }
 
 void pointcloud_callback(std_msgs::String detection_info){
-    if(detection_info.data == "found"){
+    if(detection_info.data == "found red"){
         stopGettingWaypointInfo  = true; /* to prevent getting new goals from waypoint */
         std::cout << "Found red sphere!" << std::endl;
+        goal_x = 0;
+        goal_y = 0;
+        setGoalMarker();
+    }
+    
+    else if(detection_info.data == "found blue"){
+        stopGettingWaypointInfo  = true; /* to prevent getting new goals from waypoint */
+        std::cout << "Found blue sphere!" << std::endl;
         goal_x = 0;
         goal_y = 0;
         setGoalMarker();
@@ -217,7 +223,7 @@ int main(int argc, char **argv) {
     /* first we need to engage the motors and fly up to 1.5 meters */
     motor_command.linear.x = 0.0;
     motor_command.linear.y = 0.0;
-    motor_command.linear.z = 0.3;
+    motor_command.linear.z = 0.15;
     
     motor_command.angular.x = 0.0;
     motor_command.angular.y = 0.0;

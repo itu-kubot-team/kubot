@@ -28,20 +28,6 @@ std_msgs::String str;
 ros::Publisher pub;
 int found;
 
-void callback0(const sensor_msgs::PointCloud2ConstPtr& cloud)
-{
-  callback(cloud);
-  if(found == 0)
-  {callback2(cloud);}
-  
-   
-   std_msgs::String nstr;
-   nstr.data = str.data;
-   pub.publish(nstr);
-	
-  
-}
-
 void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
 {
   pcl::PCLPointCloud2 pcl_pc2;
@@ -154,6 +140,21 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
       str.data = "found blue";
     }
    }
+}
+
+
+void callback0(const sensor_msgs::PointCloud2ConstPtr& cloud)
+{
+  callback(cloud);
+  if(found == 0)
+  {callback2(cloud);}
+  
+   
+   std_msgs::String nstr;
+   nstr.data = str.data;
+   pub.publish(nstr);
+        
+  
 }
 
 int main(int argc, char **argv) {
