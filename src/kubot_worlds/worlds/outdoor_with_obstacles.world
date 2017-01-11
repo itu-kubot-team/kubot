@@ -416,7 +416,7 @@
       <static>0</static>
     </model>
     <model name='unit_cylinder_7'>
-      <pose>1 -2 0.5 0 -0 0</pose>
+      <pose>2 -2 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -432,7 +432,7 @@
         <collision name='collision'>
           <geometry>
             <cylinder>
-              <radius>2</radius>
+              <radius>1.2</radius>
               <length>10</length>
             </cylinder>
           </geometry>
@@ -450,7 +450,7 @@
         <visual name='visual'>
           <geometry>
             <cylinder>
-              <radius>2</radius>
+              <radius>1.2</radius>
               <length>10</length>
             </cylinder>
           </geometry>
@@ -649,9 +649,9 @@
         </link>
       </model>
       <model name='unit_cylinder_5'>
-        <pose>0.636374 9.04347 5 0 -0 -6.8e-05</pose>
+        <pose>0.636374 8.54347 5 0 -0 -6.8e-05</pose>
         <link name='link'>
-          <pose>0.636374 9.04347 5 0 -0 -6.8e-05</pose>
+          <pose>0.636374 8.54347 5 0 -0 -6.8e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -667,9 +667,9 @@
         </link>
       </model>
       <model name='unit_cylinder_7'>
-        <pose>8.13742 -5.96729 4.99999 -0 -0 -6.7e-05</pose>
+        <pose>2 -4 4.99999 -0 -0 -6.7e-05</pose>
         <link name='link'>
-          <pose>8.13742 -5.96729 4.99999 -0 -0 -6.7e-05</pose>
+          <pose>2 -4 4.99999 -0 -0 -6.7e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -1124,7 +1124,7 @@
       <static>0</static>
     </model>
     <model name='unit_sphere_1'>
-      <pose>-7 4 0.5 0 -0 0</pose>
+      <pose>-6 5 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>

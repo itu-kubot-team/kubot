@@ -16,7 +16,7 @@
 
 #define PI 3.14159265
 #define MIN_ROTATION_SPEED 0.2
-#define MAX_ROTATION_SPEED 0.4
+#define MAX_ROTATION_SPEED 0.3
 #define MAX_ANGLE_DIFF  180
 #define MIN_LINEAR_SPEED 0.1
 #define MAX_LINEAR_SPEED 0.6
@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
     pointcloud_subscriber = n.subscribe("/detectionresult", 100, pointcloud_callback);
     ros::Duration time_between_ros_wakeups(0.01);
 
-    ros::Duration(0.5).sleep();
+    ros::Duration(1).sleep();
     
     
     while(ros::ok())
