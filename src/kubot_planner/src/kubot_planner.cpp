@@ -253,7 +253,6 @@ int main(int argc, char **argv) {
 
     ros::Duration(2.0).sleep();
     
-    
     while(ros::ok())
     {
         try{
