@@ -16,7 +16,7 @@
 
 #define PI 3.14159265
 #define MIN_ROTATION_SPEED 0.2
-#define MAX_ROTATION_SPEED 0.4
+#define MAX_ROTATION_SPEED 0.3
 #define MAX_ANGLE_DIFF  180
 #define MIN_LINEAR_SPEED 0.1
 #define MAX_LINEAR_SPEED 0.6
@@ -70,8 +70,8 @@ float* potential_field_obst(float x,float y, nav_msgs::OccupancyGrid grid){
             if (occupancy<0) 
                 occupancy=1.0;
             
-            /* if grid is occupied with %100 probability or occupancy information is not known. */
-            if(occupancy > 0.99){
+            /* if grid is occupied with %95 probability or occupancy information is not known. */
+            if(occupancy > 0.95){
                 float dist = sqrt(pow(obst_x - x,2) + pow(obst_y - y, 2));
                 if(dist < min_dist){
                     min_dist = dist;
@@ -201,9 +201,9 @@ void pointcloud_callback(std_msgs::String detection_info){
         setGoalMarker();
     }
     
-    else if(detection_info.data == "found blue"){
+    else if(detection_info.data == "found green"){
         stopGettingWaypointInfo  = true; /* to prevent getting new goals from waypoint */
-        std::cout << "Found blue sphere!" << std::endl;
+        std::cout << "Found green cube!" << std::endl;
         goal_x = 0;
         goal_y = 0;
         setGoalMarker();
@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
     pointcloud_subscriber = n.subscribe("/detectionresult", 100, pointcloud_callback);
     ros::Duration time_between_ros_wakeups(0.01);
 
-    ros::Duration(0.5).sleep();
+    ros::Duration(2.0).sleep();
     
     
     while(ros::ok())
