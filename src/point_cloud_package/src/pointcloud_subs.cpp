@@ -24,6 +24,7 @@ int found;
 
 void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
 {
+  ///Detection part was inspired from here -> http://answers.ros.org/question/229784/detecting-spheres-using-ransac-in-pcl/
   pcl::PCLPointCloud2 pcl_pc2;
   pcl_conversions::toPCL(*cloud,pcl_pc2); 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -32,6 +33,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
   pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
   pcl::SACSegmentation<pcl::PointXYZRGB> segmentation;
   segmentation.setInputCloud(temp_cloud);
+  ///Shapes that are available for RANSAC -> http://docs.pointclouds.org/1.7.0/group__sample__consensus.html
   segmentation.setModelType(pcl::SACMODEL_SPHERE);
   segmentation.setMethodType(pcl::SAC_RANSAC);
   segmentation.setDistanceThreshold(1000); 
