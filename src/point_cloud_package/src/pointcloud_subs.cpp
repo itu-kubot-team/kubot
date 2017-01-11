@@ -47,7 +47,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
     ROS_INFO("RANSAC found shape with [%d] points", (int)inlierIndices.indices.size());
     cout << "SPHERE!" << endl;
     str.data = "found";
-    if((int)temp_cloud->points[inlierIndices.indices[0]].r>(int)temp_cloud->points[inlierIndices.indices[0]].g && (int)temp_cloud->points[inlierIndices.indices[0]].r>(int)temp_cloud->points[inlierIndices.indices[0]].g)
+    if((int)temp_cloud->points[inlierIndices.indices[size/2]].r>(int)temp_cloud->points[inlierIndices.indices[size/2]].g && (int)temp_cloud->points[inlierIndices.indices[size/2]].r>(int)temp_cloud->points[inlierIndices.indices[size/2]].g)
     {
       cout << "RED SPHERE!" << endl;
       str.data = "found red";
