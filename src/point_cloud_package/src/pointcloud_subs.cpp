@@ -1,4 +1,3 @@
-
 #include <ros/ros.h>
 #include <iostream>
 #include <sensor_msgs/PointCloud2.h>
@@ -42,7 +41,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
    segmentation.setMethodType(pcl::SAC_RANSAC);
    segmentation.setDistanceThreshold(1000); 
    segmentation.setOptimizeCoefficients(true);
-   segmentation.setRadiusLimits(0.1, 1);
+   segmentation.setRadiusLimits(0.4, 1);
    segmentation.setMaxIterations(1000);
    
    pcl::PointIndices inlierIndices;
@@ -63,7 +62,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr& cloud)
     std_msgs::String nstr;
     nstr.data = str.data;
     pub.publish(nstr);
-	
+        
 }
 
 void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
@@ -72,17 +71,6 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
   pcl_conversions::toPCL(*cloud,pcl_pc2); 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud); 
-/*
-   pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-   pcl::SACSegmentation<pcl::PointXYZRGB> segmentation;
-   segmentation.setInputCloud(temp_cloud);
-   segmentation.setModelType(pcl::SACMODEL_CYLINDER);
-   segmentation.setMethodType(pcl::SAC_RANSAC);
-   segmentation.setDistanceThreshold(1000); 
-   segmentation.setOptimizeCoefficients(true);
-  // segmentation.setRadiusLimits(0.1, 1);
-   segmentation.setMaxIterations(100);
- */
 
       pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
       pcl::SACSegmentation<pcl::PointXYZRGB> segmentation; 
@@ -117,28 +105,18 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
     
     cout << transformedy1 << endl;
     cout << transformedy2 << endl;
-    
-    if(fabs(transformedy2- transformedy1) < 0.1)
+     cout << (int)temp_cloud->points[inlierIndices.indices[size/2]].r << endl;
+     cout << (int)temp_cloud->points[inlierIndices.indices[size/2]].g << endl;
+     cout << (int)temp_cloud->points[inlierIndices.indices[size/2]].b << endl;
+    if(fabs(transformedy2- transformedy1) < 0.1 && transformedy1 < 1.3)
     {cout << "CUBE!" << endl;
      str.data = "found cube";
-    }
-    else
-    {cout << "WALL!" << endl;}
-    
-    /*for (int c=0; c<coefficients->values.size(); ++c)
-        ROS_INFO("Coeff %d = [%f]", (int)c+1, (float)coefficients->values[c]);
-    */
-    int color_count=0;
-    BOOST_FOREACH (const pcl::PointXYZRGB& point, temp_cloud->points)
-    {
-	if (((unsigned int)point.b > (unsigned int)point.r) && ((unsigned int)point.b > (unsigned int)point.g)){
-	  color_count++;
-	}
-    }
-    if (color_count*100/inlierIndices.indices.size()> 50){
-      cout << "BLUE CUBE!"<<endl;
-      str.data = "found blue";
-    }
+    cout << "blabla" << endl;
+     if((int)temp_cloud->points[inlierIndices.indices[size/2]].g>(int)temp_cloud->points[inlierIndices.indices[size/2]].b && (int)temp_cloud->points[inlierIndices.indices[size/2]].g>(int)temp_cloud->points[inlierIndices.indices[size/2]].r){
+      cout << "GREEN CUBE!" << endl;
+      str.data = "found green";
+      }     
+    }  
    }
 }
 
@@ -146,8 +124,7 @@ void callback2(const sensor_msgs::PointCloud2ConstPtr& cloud)
 void callback0(const sensor_msgs::PointCloud2ConstPtr& cloud)
 {
   callback(cloud);
-  if(found == 0)
-  {callback2(cloud);}
+  callback2(cloud);
   
    
    std_msgs::String nstr;
@@ -181,4 +158,3 @@ int main(int argc, char **argv) {
   return 0;
     
 }
-

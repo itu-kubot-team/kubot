@@ -14,13 +14,12 @@
 #include <std_msgs/String.h>  
 #include <cmath>
 
-#define PI 3.14159265
-#define MIN_ROTATION_SPEED 0.2
-#define MAX_ROTATION_SPEED 0.3
+#define MIN_ROTATION_SPEED 0.15
+#define MAX_ROTATION_SPEED 0.25
 #define MAX_ANGLE_DIFF  180
 #define MIN_LINEAR_SPEED 0.1
 #define MAX_LINEAR_SPEED 0.6
-#define ROBOT_FLYING_HEIGHT 1.5
+#define ROBOT_FLYING_HEIGHT 1.6
 
 float marker_counter = 0;
 float dir_x;
@@ -303,8 +302,8 @@ int main(int argc, char **argv) {
                         
             ros::Duration(0.1).sleep();
             listener.lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
-            robot_theta= normalize_angle(robot_pose.getRotation().getAngle()*robot_axis[2] * 180/PI);
-            std::cout << "normalize edilmemiş robot teta: " << robot_pose.getRotation().getAngle()*robot_axis[2] * 180/PI << " || " << robot_pose.getRotation().getAngle()*robot_axis[2] << std::endl;
+            robot_theta= normalize_angle(robot_pose.getRotation().getAngle()*robot_axis[2] * 180/M_PI);
+            std::cout << "normalize edilmemiş robot teta: " << robot_pose.getRotation().getAngle()*robot_axis[2] * 180/M_PI << " || " << robot_pose.getRotation().getAngle()*robot_axis[2] << std::endl;
             std::cout << "robot_theta : " << robot_theta << std::endl;
             std::cout << "marker_angle: " << marker_angle << std::endl;
         }

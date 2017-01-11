@@ -190,16 +190,16 @@ Visualization Manager:
       Marker Topic: /marker_vis
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Alpha: 1
       Class: rviz/PointStamped
-      Color: 204; 41; 204
+      Color: 255; 255; 0
       Enabled: true
       History Length: 1
       Name: PointStamped
-      Radius: 0.2
+      Radius: 0.4
       Topic: /waypoint
       Unreliable: false
       Value: true
@@ -208,7 +208,7 @@ Visualization Manager:
       Marker Topic: /markers
       Name: MarkerArray
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -235,7 +235,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 8.5678
+      Distance: 23.7592
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
