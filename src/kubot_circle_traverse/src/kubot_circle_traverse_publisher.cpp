@@ -111,9 +111,6 @@ int main(int argc, char **argv){
         
         float robot_x = robot_pose.getOrigin().x();
         float robot_y = robot_pose.getOrigin().y();
-        //Convert the quaternion-based orientation of the latest message to angle-axis in order to get the z rotation & print it.
-        //tf::Vector3 robot_axis=robot_pose.getRotation().getAxis();
-        //double robot_theta=robot_pose.getRotation().getAngle()*robot_axis[2] * 180 / M_PI; // only need the z axis
         
         std::cout << "Robot Position: {x:" << robot_x << ", y: " << robot_y << "}" << std::endl; // << " Angle: " << robot_pose.getRotation().getAngle()*robot_axis[2] * 180 / M_PI << " Normalized angle: " << normalize_angle(robot_theta) << std::endl;
         std::cout << "Current Goal: {x:" << current_goal.x << ", y: " << current_goal.y << "}" << std::endl;
@@ -168,21 +165,6 @@ visualization_msgs::Marker point_marker_at(float x, float y){
   marker.id = id++;
   
   return marker;
-}
-
-float normalize_angle(float angle_in_degree){
-    while(angle_in_degree > 360){
-        angle_in_degree -= 360;
-    }
-    while(angle_in_degree < -360){
-        angle_in_degree += 360;
-    }
-    if(angle_in_degree > 180){
-        angle_in_degree -= 360;
-    }else if(angle_in_degree < -180){
-        angle_in_degree += 360;
-    }
-    return angle_in_degree;
 }
 
 bool are_two_points_close(double x_1, double y_1, double x_2, double y_2){
