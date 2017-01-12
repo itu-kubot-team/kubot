@@ -38,6 +38,7 @@ sensor_msgs::LaserScan laser_msg;
 
 bool isGoalSet = false;
 
+/* TAKEN FROM POTENTIAL FIELDS CODE FROM THE CLASS, CHANGED A LITTLE BIT */
 float* potential_field_goal(float x, float y){
     float _dir_x = goal_x - x;
     float _dir_y = goal_y - y;
@@ -47,6 +48,8 @@ float* potential_field_goal(float x, float y){
     return pf_goal;
 }
 
+
+/* TAKEN FROM POTENTIAL FIELDS CODE FROM THE CLASS, CHANGED A LITTLE BIT */
 float* potential_field_obst(float x,float y, nav_msgs::OccupancyGrid grid){
     float originx = grid.info.origin.position.x;
     float originy = grid.info.origin.position.y;
@@ -95,6 +98,7 @@ float* potential_field_obst(float x,float y, nav_msgs::OccupancyGrid grid){
     return pf_obst;
 }
 
+/* TAKEN FROM POTENTIAL FIELDS CODE FROM THE CLASS, CHANGED A LITTLE BIT */
 void potential_field(float x,float y,float goal_x, float goal_y, nav_msgs::OccupancyGrid grid){
     float *pf_goal = potential_field_goal(x,y);
     float *pf_obst = potential_field_obst(x,y,grid);
@@ -102,6 +106,7 @@ void potential_field(float x,float y,float goal_x, float goal_y, nav_msgs::Occup
     dir_y = pf_goal[1] + pf_obst[1];
 }
 
+/* TAKEN FROM POTENTIAL FIELDS CODE FROM THE CLASS, CHANGED A LITTLE BIT */
 visualization_msgs::Marker arrow_marker_at(float x, float y) {
     visualization_msgs::Marker marker;
     marker.header.frame_id = "/world";
@@ -131,6 +136,7 @@ visualization_msgs::Marker arrow_marker_at(float x, float y) {
     marker.id = marker_counter++;
     return marker;
 }
+
 
 float normalize_angle(float angle_in_degree){
     while(angle_in_degree > 360){
@@ -172,6 +178,7 @@ void map_callback(nav_msgs::OccupancyGrid grid){
     std::cout << "Robot: x: " << robot_pose.getOrigin().x() << " y: " << robot_pose.getOrigin().x() << std::endl;
     std::cout << "Goal: x: " << goal_x << " y: " << goal_y << std::endl;
     
+    /* Calculate potential field based on the robot's location on the world */
     potential_field(robot_pose.getOrigin().x(), robot_pose.getOrigin().y(), goal_x, goal_y, grid);
     visualization_msgs::Marker marker = arrow_marker_at(robot_pose.getOrigin().x(),robot_pose.getOrigin().y());
     marker_array.markers.push_back(marker);
@@ -229,10 +236,10 @@ int main(int argc, char **argv) {
     motor_command.angular.z = 0.0;
     motor_command_publisher.publish(motor_command);
     
+    /* semaphore */
     tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
     while(fabs(robot_pose.getOrigin().z() - ROBOT_FLYING_HEIGHT) > 0.01){
         tListener->lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
-        std::cout << "height: " << robot_pose.getOrigin().z() << std::endl;
     }
     
     /* then we should stop and look for goals. */
@@ -265,7 +272,7 @@ int main(int argc, char **argv) {
         }
         ros::spinOnce();
         
-        if(isGoalSet == false)
+        if(isGoalSet == false) /* if waypoint is not published yet */
             continue;
         
         /* get head and tail of current arrow marker */
@@ -282,8 +289,8 @@ int main(int argc, char **argv) {
         float angle_dif = normalize_angle(robot_theta - marker_angle);
         if(fabs(angle_dif) > 5){ /* then i must change my angle in order to keep robot's camera vision looking forward*/
          
+            /* calculate rotation speed and rotation direction(left or right) to closer way */
             float rot_speed = MIN_ROTATION_SPEED + (log(fabs(angle_dif))/log(MAX_ANGLE_DIFF)*(MAX_ROTATION_SPEED - MIN_ROTATION_SPEED));
-            std::cout << "fabs olmayan difference: " << normalize_angle(robot_theta - marker_angle) << std::endl;
             if(normalize_angle(robot_theta - marker_angle) > 0){
                 angular_z = -1* rot_speed;
             }
@@ -302,13 +309,10 @@ int main(int argc, char **argv) {
             ros::Duration(0.1).sleep();
             listener.lookupTransform("/world","/base_link", ros::Time(0), robot_pose);
             robot_theta= normalize_angle(robot_pose.getRotation().getAngle()*robot_axis[2] * 180/M_PI);
-            std::cout << "normalize edilmemiş robot teta: " << robot_pose.getRotation().getAngle()*robot_axis[2] * 180/M_PI << " || " << robot_pose.getRotation().getAngle()*robot_axis[2] << std::endl;
-            std::cout << "robot_theta : " << robot_theta << std::endl;
-            std::cout << "marker_angle: " << marker_angle << std::endl;
         }
         
         else { /* then i can follow to current path */
-            motor_command.linear.x = 0.30 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2));
+            motor_command.linear.x = 0.30 * sqrt(pow(head.x - tail.x,2)+pow(head.y-tail.y,2)); /* proportional speed */
             motor_command.linear.y = 0.0;
             motor_command.linear.z = 0.0;
             
@@ -333,7 +337,6 @@ int main(int argc, char **argv) {
             motor_command.angular.y = 0;
             motor_command.angular.z = 0.0;
             motor_command_publisher.publish(motor_command);
-            std::cout << "Move: x: " << motor_command.linear.x << " y: " << motor_command.linear.y << std::endl;
         }
         
         time_between_ros_wakeups.sleep();
